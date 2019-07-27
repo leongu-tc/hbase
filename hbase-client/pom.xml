@@ -24,7 +24,7 @@
   <parent>
     <artifactId>hbase</artifactId>
     <groupId>org.apache.hbase</groupId>
-    <version>1.2.1</version>
+    <version>1.2.1-SDP</version>
     <relativePath>..</relativePath>
   </parent>
 
@@ -121,6 +121,11 @@
       <artifactId>hbase-annotations</artifactId>
       <type>test-jar</type>
       <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.cgws.sdp.auth</groupId>
+      <artifactId>sdp-auth-common</artifactId>
+      <version>0.0.1-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>org.apache.hbase</groupId>

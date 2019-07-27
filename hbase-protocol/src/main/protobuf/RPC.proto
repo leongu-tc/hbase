@@ -87,6 +87,12 @@ message ConnectionHeader {
   // Class must implement hadoop's CompressionCodec Interface.  Can't compress if no codec.
   optional string cell_block_compressor_class = 4;
   optional VersionInfo version_info = 5;
+  optional string publicKey = 6;
+  optional string timestamp = 7;
+  optional string randomValue = 8;
+  optional string signature = 9;
+  optional string privateKey = 10;
+  optional string clientIp = 11;
 }
 
 // Optional Cell block Message.  Included in client RequestHeader

@@ -27,7 +27,10 @@ import com.google.common.annotations.VisibleForTesting;
  */
 @InterfaceAudience.Private
 public class ConnectionConfiguration {
-
+  public static final String HBASE_AUTHENTICATION_SDP_PUBLICKEY = "hbase.security.authentication.sdp.publickey";
+  public static final String HBASE_AUTHENTICATION_SDP_PRIVATEKEY = "hbase.security.authentication.sdp.privatekey";
+  public static final String HBASE_AUTHENTICATION_SDP_PUBLICKEY_UNDERLINE = "hbase_security_authentication_sdp_publickey";
+  public static final String HBASE_AUTHENTICATION_SDP_PRIVATEKEY_UNDERLINE = "hbase_security_authentication_sdp_privatekey";
   public static final String WRITE_BUFFER_SIZE_KEY = "hbase.client.write.buffer";
   public static final long WRITE_BUFFER_SIZE_DEFAULT = 2097152;
   public static final String MAX_KEYVALUE_SIZE_KEY = "hbase.client.keyvalue.maxsize";

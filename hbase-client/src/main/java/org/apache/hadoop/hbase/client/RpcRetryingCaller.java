@@ -38,6 +38,8 @@ import org.apache.hadoop.ipc.RemoteException;
 
 import com.google.protobuf.ServiceException;
 
+import  org.apache.hadoop.hbase.AuthFailedException;
+
 /**
  * Runs an rpc'ing {@link RetryingCallable}. Sets into rpc client
  * threadlocal outstanding timeouts as so we don't persist too much.
@@ -127,6 +129,10 @@ public class RpcRetryingCaller<T> {
       } catch (PreemptiveFastFailException e) {
         throw e;
       } catch (Throwable t) {
+      if (t instanceof AuthFailedException) 
+      {
+          throw new RuntimeException(t);
+      }
         ExceptionUtil.rethrowIfInterrupt(t);
         if (tries > startLogErrorsCnt) {
           LOG.info("Call exception, tries=" + tries + ", retries=" + retries + ", started=" +

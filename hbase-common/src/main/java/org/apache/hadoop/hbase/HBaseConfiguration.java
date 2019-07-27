@@ -20,7 +20,9 @@ package org.apache.hadoop.hbase;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -28,7 +30,6 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.classification.InterfaceAudience;
 import org.apache.hadoop.hbase.classification.InterfaceStability;
 import org.apache.hadoop.hbase.io.util.HeapMemorySizeUtil;
-import org.apache.hadoop.hbase.util.VersionInfo;
 import org.apache.hadoop.hbase.zookeeper.ZKConfig;
 
 /**
@@ -38,7 +39,12 @@ import org.apache.hadoop.hbase.zookeeper.ZKConfig;
 @InterfaceStability.Stable
 public class HBaseConfiguration extends Configuration {
   private static final Log LOG = LogFactory.getLog(HBaseConfiguration.class);
-
+  private static final Map<String, String> sdpAuthKeys = new HashMap<String, String>();
+  static{
+    sdpAuthKeys.put("hbase_security_authentication_sdp_publickey", "hbase.security.authentication.sdp.publickey");
+    sdpAuthKeys.put("hbase_security_authentication_sdp_privatekey", "hbase.security.authentication.sdp.privatekey");
+  }
+  
   /**
    * Instantiating HBaseConfiguration() is deprecated. Please use
    * HBaseConfiguration#create() to construct a plain Configuration
@@ -48,6 +54,7 @@ public class HBaseConfiguration extends Configuration {
     //TODO:replace with private constructor, HBaseConfiguration should not extend Configuration
     super();
     addHbaseResources(this);
+    loadSdpAuthParams(this);
     LOG.warn("instantiating HBaseConfiguration() is deprecated. Please use"
         + " HBaseConfiguration#create() to construct a plain Configuration");
   }
@@ -61,17 +68,34 @@ public class HBaseConfiguration extends Configuration {
     //TODO:replace with private constructor
     this();
     merge(this, c);
+    
+    loadSdpAuthParams(this);
+  }
+  
+  private static void loadSdpAuthParams(Configuration conf){
+    LOG.info("start load auth param from env or sys properties...");
+    Map<String, String> envs = System.getenv();
+    Properties sysProps = System.getProperties();
+    for( String key : sdpAuthKeys.keySet() ){
+      if( envs.get(key) != null ){
+        conf.set(sdpAuthKeys.get(key),envs.get(key));
+        LOG.debug(String.format("loaded auth param from evn. key:%s value:%s", key,envs.get(key)));
+      }else if( sysProps.get(key) != null ){
+        conf.set(sdpAuthKeys.get(key),(String)sysProps.get(key));
+        LOG.debug(String.format("loaded auth param from conf. key:%s value:%s", key,(String)sysProps.get(key)));
+      }    
+    }
   }
 
   private static void checkDefaultsVersion(Configuration conf) {
-    if (conf.getBoolean("hbase.defaults.for.version.skip", Boolean.FALSE)) return;
-    String defaultsVersion = conf.get("hbase.defaults.for.version");
-    String thisVersion = VersionInfo.getVersion();
-    if (!thisVersion.equals(defaultsVersion)) {
-      throw new RuntimeException(
-        "hbase-default.xml file seems to be for an older version of HBase (" +
-        defaultsVersion + "), this version is " + thisVersion);
-    }
+//    if (conf.getBoolean("hbase.defaults.for.version.skip", Boolean.FALSE)) return;
+//    String defaultsVersion = conf.get("hbase.defaults.for.version");
+//    String thisVersion = VersionInfo.getVersion();
+//    if (!thisVersion.equals(defaultsVersion)) {
+//      throw new RuntimeException(
+//        "hbase-default.xml file seems to be for an older version of HBase (" +
+//        defaultsVersion + "), this version is " + thisVersion);
+//    }
   }
 
   public static Configuration addHbaseResources(Configuration conf) {
@@ -93,6 +117,7 @@ public class HBaseConfiguration extends Configuration {
     // Configuration, conf needs to be set with appropriate class loader to resolve
     // HBase resources.
     conf.setClassLoader(HBaseConfiguration.class.getClassLoader());
+    loadSdpAuthParams(conf);
     return addHbaseResources(conf);
   }
 
@@ -104,6 +129,7 @@ public class HBaseConfiguration extends Configuration {
   public static Configuration create(final Configuration that) {
     Configuration conf = create();
     merge(conf, that);
+    loadSdpAuthParams(conf);
     return conf;
   }
 

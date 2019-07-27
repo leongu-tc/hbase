@@ -23,7 +23,7 @@
   <parent>
     <artifactId>hbase</artifactId>
     <groupId>org.apache.hbase</groupId>
-    <version>1.2.1</version>
+    <version>1.2.1-SDP</version>
     <relativePath>..</relativePath>
   </parent>
   <artifactId>hbase-thrift</artifactId>
@@ -329,6 +329,11 @@
     <dependency>
       <groupId>tomcat</groupId>
       <artifactId>jasper-runtime</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.cgws.sdp.auth</groupId>
+      <artifactId>sdp-auth-plugin</artifactId>
+      <version>0.0.1-SNAPSHOT</version>
     </dependency>
   </dependencies>
 

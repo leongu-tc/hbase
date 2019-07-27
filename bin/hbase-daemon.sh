@@ -267,7 +267,10 @@ case $startStop in
     ;;
 
 (stop)
-    rm -f "$HBASE_START_FILE"
+    if [ -f "${HBASE_START_FILE}" ];then
+       rm -f "$HBASE_START_FILE"
+    fi
+    
     if [ -f $HBASE_PID ]; then
       pidToKill=`cat $HBASE_PID`
       # kill -0 == see if the PID exists
@@ -283,7 +286,9 @@ case $startStop in
     else
       echo no $command to stop because no pid file $HBASE_PID
     fi
-    rm -f $HBASE_PID
+    if [ -f "${HBASE_PID}" ];then
+       rm -f $HBASE_PID
+    fi
   ;;
 
 (restart)

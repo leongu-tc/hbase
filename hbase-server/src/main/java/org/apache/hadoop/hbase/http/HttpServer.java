@@ -77,7 +77,6 @@ import org.mortbay.jetty.handler.RequestLogHandler;
 import org.mortbay.jetty.nio.SelectChannelConnector;
 import org.mortbay.jetty.security.SslSocketConnector;
 import org.mortbay.jetty.servlet.Context;
-import org.mortbay.jetty.servlet.DefaultServlet;
 import org.mortbay.jetty.servlet.FilterHolder;
 import org.mortbay.jetty.servlet.FilterMapping;
 import org.mortbay.jetty.servlet.ServletHandler;
@@ -658,10 +657,13 @@ public class HttpServer implements FilterContainer {
     // set up the context for "/static/*"
     Context staticContext = new Context(parent, "/static");
     staticContext.setResourceBase(appDir + "/static");
-    staticContext.addServlet(DefaultServlet.class, "/*");
+    staticContext.addServlet(StaticSourceServlet.class, "/*");
     staticContext.setDisplayName("static");
     setContextAttributes(staticContext, conf);
     defaultContexts.put(staticContext, true);
+    
+    
+   
   }
 
   private void setContextAttributes(Context context, Configuration conf) {

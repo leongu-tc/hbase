@@ -1,0 +1,2 @@
+mvn clean install -DskipTests -Prelease -Drat.numUnapprovedLicenses=100
+mvn install -DskipTests site assembly:single -Prelease -Drat.numUnapprovedLicenses=100

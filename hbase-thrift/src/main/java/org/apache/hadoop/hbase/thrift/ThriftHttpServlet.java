@@ -25,6 +25,8 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.cgws.sdp.auth.plugin.SdpAuthenticator;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
@@ -51,6 +53,7 @@ import org.ietf.jgss.Oid;
 @InterfaceAudience.Private
 public class ThriftHttpServlet extends TServlet {
   private static final long serialVersionUID = 1L;
+  private static final String SDP_AUTHENTICATION_HEADER = "sdp-auth";
   private static final Log LOG = LogFactory.getLog(ThriftHttpServlet.class.getName());
   private transient final UserGroupInformation realUser;
   private transient final Configuration conf;
@@ -63,6 +66,7 @@ public class ThriftHttpServlet extends TServlet {
   public static final String WWW_AUTHENTICATE = "WWW-Authenticate";
   public static final String AUTHORIZATION = "Authorization";
   public static final String NEGOTIATE = "Negotiate";
+  private boolean sdpAuthenticationEnabled = false;
 
   public ThriftHttpServlet(TProcessor processor, TProtocolFactory protocolFactory,
       UserGroupInformation realUser, Configuration conf, ThriftServerRunner.HBaseHandler
@@ -73,8 +77,17 @@ public class ThriftHttpServlet extends TServlet {
     this.hbaseHandler = hbaseHandler;
     this.securityEnabled = securityEnabled;
     this.doAsEnabled = doAsEnabled;
+    this.sdpAuthenticationEnabled = conf.getBoolean("hbase.security.authentication.sdp.enable", false);
   }
-
+  
+  private void addErrorResponse(String errorMsg, HttpServletResponse response) throws IOException{
+    LOG.error("Authenticate by keypair failed. Error:" + errorMsg);
+    
+    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+//    response.addHeader(WWW_AUTHENTICATE, NEGOTIATE);
+    response.getWriter().println("Authenticate by keypair failed. Error:" + errorMsg);
+  }
+  
   @Override
   protected void doPost(HttpServletRequest request, HttpServletResponse response)
       throws ServletException, IOException {
@@ -96,6 +109,34 @@ public class ThriftHttpServlet extends TServlet {
         return;
       }
     }
+    
+    // add keypair authentication
+    if (sdpAuthenticationEnabled) {
+      String authenticationHeader = request.getHeader(SDP_AUTHENTICATION_HEADER);
+      if (StringUtils.isBlank(authenticationHeader)) {
+        addErrorResponse("SDP Authentication header[sdp-auth] deos not set", response);
+        return;
+      }
+      
+      String[] fields = StringUtils.split(authenticationHeader, " ");
+      if (fields == null || fields.length != 4) {
+        addErrorResponse("The authentication header require 4 parameters", response);
+        return;
+      }
+      
+      try {
+        String publicKey = fields[0].trim();
+        long timestamp = Long.parseLong(fields[1].trim());
+        int randomValue = Integer.parseInt(fields[2].trim());
+        String signature = fields[3].trim();
+        
+        effectiveUser = SdpAuthenticator.getInstance().authenticate(publicKey, timestamp, randomValue, signature).getName();
+      } catch (Exception e) {
+        addErrorResponse(e.getMessage(), response);
+        return;
+      }
+    }
+    
     String doAsUserFromQuery = request.getHeader("doAs");
     if(effectiveUser == null) {
       effectiveUser = realUser.getShortUserName();

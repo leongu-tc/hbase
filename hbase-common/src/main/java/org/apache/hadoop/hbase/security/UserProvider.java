@@ -156,7 +156,7 @@ public class UserProvider extends BaseConfigurable {
    *         from {@code UserGroupInformation.isSecurityEnabled()}.
    */
   public boolean isHadoopSecurityEnabled() {
-    return User.isSecurityEnabled();
+    return User.isSecurityEnabled() && !UserGroupInformation.isAuthenticationEnabled(UserGroupInformation.AuthenticationMethod.SDP);
   }
 
   /**

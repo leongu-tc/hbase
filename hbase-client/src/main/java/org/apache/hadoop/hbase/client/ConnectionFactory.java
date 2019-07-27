@@ -20,14 +20,21 @@ package org.apache.hadoop.hbase.client;
 
 import java.io.IOException;
 import java.lang.reflect.Constructor;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Properties;
 import java.util.concurrent.ExecutorService;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.hadoop.hbase.classification.InterfaceAudience;
 import org.apache.hadoop.hbase.classification.InterfaceStability;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.HBaseConfiguration;
 import org.apache.hadoop.hbase.security.User;
 import org.apache.hadoop.hbase.security.UserProvider;
+import org.apache.hadoop.security.UserGroupInformation;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -57,6 +64,13 @@ import org.apache.hadoop.hbase.security.UserProvider;
 @InterfaceAudience.Public
 @InterfaceStability.Evolving
 public class ConnectionFactory {
+  private static final Logger LOG = LoggerFactory.getLogger(ConnectionFactory.class);
+  public static Map<String, String> sdpAuthKeys = new HashMap<String, String>();
+  
+  static{
+    sdpAuthKeys.put("hbase_security_authentication_sdp_publickey", ConnectionConfiguration.HBASE_AUTHENTICATION_SDP_PUBLICKEY);
+    sdpAuthKeys.put("hbase_security_authentication_sdp_privatekey", ConnectionConfiguration.HBASE_AUTHENTICATION_SDP_PRIVATEKEY);
+  }
 
   /** No public c.tors */
   protected ConnectionFactory() {
@@ -210,17 +224,58 @@ public class ConnectionFactory {
    */
   public static Connection createConnection(Configuration conf, ExecutorService pool, User user)
   throws IOException {
+//    if (user == null) {
+//      UserProvider provider = UserProvider.instantiate(conf);
+//      user = provider.getCurrent();
+//    }
+    
     if (user == null) {
       UserProvider provider = UserProvider.instantiate(conf);
-      user = provider.getCurrent();
+      try {
+        user = provider.getCurrent();
+      } catch (Exception e) {
+        LOG.warn("Failed to get current user from configuration.", e);
+        user = null;
+      }
+      
+      if (user == null) {
+        user = getCurrentUser();
+      }
     }
 
     return createConnection(conf, false, pool, user);
+  }
+  
+  private static User getCurrentUser(){
+    String currentUserName = System.getProperty("user.name");
+    if(StringUtils.isBlank(currentUserName)){
+      LOG.warn("The current user name is blank, and set it to hbase user.");
+      currentUserName = "hbase";
+    }
+    
+    return new User.SecureHadoopUser(UserGroupInformation.createRemoteUser(currentUserName));
+  }
+  
+  public static void loadSdpAuthParams(Configuration conf){
+    LOG.debug("start load auth param from env or sys properties...");
+    Map<String, String> envs = System.getenv();
+    Properties sysProps = System.getProperties();
+    for( String key : sdpAuthKeys.keySet() ){
+      if( envs.get(key) != null ){
+        conf.set(sdpAuthKeys.get(key),envs.get(key));
+        LOG.debug("loaded hbase authentication parameter from evn. key:{} value:{}",key,envs.get(key));
+      }else if( sysProps.get(key) != null ){
+        conf.set(sdpAuthKeys.get(key),(String)sysProps.get(key));
+        LOG.debug("loaded hbase authentication parameter from conf. key:{} value:{}",key,(String)sysProps.get(key));
+      }    
+    }
   }
 
   static Connection createConnection(final Configuration conf, final boolean managed,
       final ExecutorService pool, final User user)
   throws IOException {
+    loadSdpAuthParams(conf);
+    
     String className = conf.get(HConnection.HBASE_CLIENT_CONNECTION_IMPL,
       ConnectionManager.HConnectionImplementation.class.getName());
     Class<?> clazz = null;

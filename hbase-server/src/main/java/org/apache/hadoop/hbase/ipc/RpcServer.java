@@ -57,7 +57,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -65,6 +64,7 @@ import javax.security.sasl.Sasl;
 import javax.security.sasl.SaslException;
 import javax.security.sasl.SaslServer;
 
+import com.cgws.sdp.auth.plugin.SdpAuthenticator;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.hbase.CallQueueTooBigException;
@@ -129,7 +129,7 @@ import org.apache.hadoop.security.token.TokenIdentifier;
 import org.apache.hadoop.util.StringUtils;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.apache.htrace.TraceInfo;
-
+import org.apache.ranger.plugin.util.ClusterHostsCache;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.google.protobuf.BlockingService;
 import com.google.protobuf.CodedInputStream;
@@ -137,6 +137,7 @@ import com.google.protobuf.Descriptors.MethodDescriptor;
 import com.google.protobuf.Message;
 import com.google.protobuf.ServiceException;
 import com.google.protobuf.TextFormat;
+import com.cgws.sdp.rpc.portal.UserDoc;
 
 /**
  * An RPC server that hosts protobuf described Services.
@@ -279,6 +280,11 @@ public class RpcServer implements RpcServerInterface, ConfigurationObserver {
   private final BoundedByteBufferPool reservoir;
 
   private volatile boolean allowFallbackToSimpleAuth;
+  private String portalIp;
+  private int portalPort;
+  private SdpAuthenticator sdpAuthenticator;
+  private boolean useSdpAuthenticator = true;
+  private List<String> whiteUsers = null;
 
   /**
    * Datastructure that holds all necessary to a method invocation and then afterward, carries
@@ -1646,7 +1652,15 @@ public class RpcServer implements RpcServerInterface, ConfigurationObserver {
       this.service = getService(services, serviceName);
       if (this.service == null) throw new UnknownServiceException(serviceName);
       setupCellBlockCodecs(this.connectionHeader);
-      UserGroupInformation protocolUser = createUser(connectionHeader);
+      
+      LOG.debug("process hbase authentication. effectiveUser:" + connectionHeader.getUserInfo().getEffectiveUser() + " realUser:" + connectionHeader.getUserInfo().getRealUser());
+      String authenticatedUser = "";
+      if (useSdpAuthenticator && !(isInnerRequest(connectionHeader))) {
+        authenticatedUser = authenticate(connectionHeader);
+      }
+      LOG.info("authenticated user:" + authenticatedUser);
+      UserGroupInformation protocolUser = createUser(connectionHeader, authenticatedUser);
+      
       if (!useSasl) {
         ugi = protocolUser;
         if (ugi != null) {
@@ -1694,8 +1708,63 @@ public class RpcServer implements RpcServerInterface, ConfigurationObserver {
         AUDITLOG.info("Connection from " + this.hostAddress + " port: " + this.remotePort
             + " with unknown version info");
       }
+    }
 
+    private boolean isInnerRequest(ConnectionHeader connectionHeader) {
+      String requestIp = this.hostAddress;
+      String requestUser = connectionHeader.getUserInfo().getEffectiveUser();
+      Map<String,Integer> hostsCache = ClusterHostsCache.getClusterHosts();
+      LOG.debug("sdp inner hosts info:" + hostsCache);
+      LOG.debug(String.format("hbase authentication white user:%s    request ip:%s   request User:%s", whiteUsers, requestIp, requestUser));
+      if ((hostsCache != null) && hostsCache.get(requestIp) != null && (whiteUsers.contains(requestUser.trim()))) {
+        return true;
+      }else {
+        return false;
+      }
+    }
 
+    private String authenticate(ConnectionHeader connectionHeader) throws AccessDeniedException {
+      LOG.debug("start hbase authentication. requtestIP:" + hostAddress);
+      String requestIp = this.hostAddress;
+        try {
+          String publicKey = connectionHeader.getPublicKey();
+        if (org.apache.commons.lang.StringUtils.isBlank(publicKey)) {
+          LOG.error("Authenticate failed. The publicKey is blank. requetIp:" + requestIp);
+          throw new AccessDeniedException("Authenticate failed. The publicKey is blank.");
+        }
+          
+          String timestampStr = connectionHeader.getTimestamp();
+          if (org.apache.commons.lang.StringUtils.isBlank(timestampStr)) {
+            LOG.error("Authenticate failed. The timestamp is blank. requetIp:" + requestIp);
+            throw new AccessDeniedException("Authenticate failed. The timestamp is blank.");
+          }
+          long timestamp = Long.parseLong(timestampStr);
+          
+          String randomValueStr = connectionHeader.getRandomValue();
+          if (org.apache.commons.lang.StringUtils.isBlank(randomValueStr)) {
+            LOG.error("Authenticate failed. The randomValue is blank. requetIp:" + requestIp);
+            throw new AccessDeniedException("Authenticate failed. The random value is blank.");
+          }
+          int randomValue = Integer.parseInt(randomValueStr);
+          
+          String signature = connectionHeader.getSignature();
+          if (org.apache.commons.lang.StringUtils.isBlank(signature)) {
+            LOG.error("Authenticate failed. The signature is blank. requetIp:" + requestIp);
+            throw new AccessDeniedException("Authenticate failed. The signature is blank.");
+          }
+          
+          LOG.debug(String.format("publicKey:%s timestamp:%s  randomValueStr:%s signature:%s portalIp:%s portalPort:%d", publicKey, timestampStr, randomValueStr,signature, portalIp, portalPort));
+          UserDoc user =  sdpAuthenticator.authenticate(publicKey, timestamp, randomValue, signature);
+          return user.getName();
+        } 
+        catch (AccessDeniedException e) {
+          LOG.error("authenticon failed. requestIp:" + requestIp , e);
+          throw e;
+        } 
+        catch (Exception e) {
+          LOG.error("authenticon failed. requestIp:" + requestIp , e);
+          throw new AccessDeniedException("Authenticate failed.");
+        } 
     }
 
     /**
@@ -1764,7 +1833,15 @@ public class RpcServer implements RpcServerInterface, ConfigurationObserver {
       if (connectionHeaderRead) {
         processRequest(buf);
       } else {
-        processConnectionHeader(buf);
+        try
+        {
+          processConnectionHeader(buf);
+        } catch(AccessDeniedException ex)
+        {
+           handleAuthFailed(buf, ex.getMessage());
+           throw ex;
+        }
+
         this.connectionHeaderRead = true;
         if (!authorizeConnection()) {
           // Throw FatalConnectionException wrapping ACE so client does right thing and closes
@@ -1774,6 +1851,21 @@ public class RpcServer implements RpcServerInterface, ConfigurationObserver {
         }
         this.user = userProvider.create(this.ugi);
       }
+    }
+    
+    private void handleAuthFailed(byte[] buf, String message)
+    {
+      try
+      {
+        setupResponse(authFailedResponse, authFailedCall,
+            new AccessDeniedException(message), message);
+        responder.doRespond(authFailedCall);
+      }
+      catch(Exception ex)
+      {
+        LOG.error("Auth failed:", ex);
+      }
+
     }
 
     /**
@@ -1931,7 +2023,7 @@ public class RpcServer implements RpcServerInterface, ConfigurationObserver {
       }
     }
 
-    private UserGroupInformation createUser(ConnectionHeader head) {
+    private UserGroupInformation createUser(ConnectionHeader head, String authenticatedUser) {
       UserGroupInformation ugi = null;
 
       if (!head.hasUserInfo()) {
@@ -1942,19 +2034,37 @@ public class RpcServer implements RpcServerInterface, ConfigurationObserver {
       if (userInfoProto.hasEffectiveUser()) {
         effectiveUser = userInfoProto.getEffectiveUser();
       }
+      
       String realUser = null;
       if (userInfoProto.hasRealUser()) {
         realUser = userInfoProto.getRealUser();
       }
+      
+      // the effective user is the running user, the realUser is the really logined user
       if (effectiveUser != null) {
         if (realUser != null) {
+          // proxy mode, will be set the authenticatedUser as the realUser. 
           UserGroupInformation realUserUgi =
               UserGroupInformation.createRemoteUser(realUser);
+          LOG.debug("old realUser:" + realUser);
+          if (org.apache.commons.lang.StringUtils.isNotBlank(authenticatedUser)) {
+            LOG.debug("new realUser:" + authenticatedUser);
+            realUserUgi = UserGroupInformation.createRemoteUser(authenticatedUser);
+          }
           ugi = UserGroupInformation.createProxyUser(effectiveUser, realUserUgi);
         } else {
+          LOG.debug("old effectiveUser:" + effectiveUser);
+          // direct login mode. it will be set the authenticatedUser as the running user. in this mode, the running user and login user is the same user.
+          if (org.apache.commons.lang.StringUtils.isNotBlank(authenticatedUser)) {
+            LOG.debug("new effectiveUser:" + authenticatedUser);
+            effectiveUser = authenticatedUser;
+          }
+          
+          LOG.debug("final effectiveUser:" + effectiveUser);
           ugi = UserGroupInformation.createRemoteUser(effectiveUser);
         }
       }
+      
       return ugi;
     }
   }
@@ -2048,6 +2158,15 @@ public class RpcServer implements RpcServerInterface, ConfigurationObserver {
 
     this.scheduler = scheduler;
     this.scheduler.init(new RpcSchedulerContext(this));
+    
+    // init portal info
+    this.portalIp = conf.get("sdp.portal.rpc.ip");
+    this.portalPort = Integer.parseInt(conf.get("sdp.portal.rpc.port"));
+    this.sdpAuthenticator = SdpAuthenticator.getInstance(portalIp, portalPort, "hbase");
+    this.useSdpAuthenticator = conf.getBoolean("hbase.security.authentication.sdp.enable",false);
+    
+    String systemUserStr = conf.get("hbase.system.user.authentication.whitelist");
+    this.whiteUsers = Arrays.asList(StringUtils.split(systemUserStr, ','));
   }
 
   @Override

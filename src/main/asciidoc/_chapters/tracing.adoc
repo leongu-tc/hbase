@@ -61,7 +61,7 @@ The `LocalFileSpanReceiver` looks in _hbase-site.xml_      for a `hbase.local-fi
 </property>
 <property>
   <name>hbase.htrace.local-file-span-receiver.path</name>
-  <value>/var/log/hbase/htrace.out</value>
+  <value>/var/log/sdp/hbase/htrace.out</value>
 </property>
 ----
 

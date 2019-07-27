@@ -33,9 +33,9 @@
 namespace java org.apache.hadoop.hbase.thrift.generated
 namespace cpp  apache.hadoop.hbase.thrift
 namespace rb Apache.Hadoop.Hbase.Thrift
-namespace py hbase
-namespace perl Hbase
-namespace php Hbase
+namespace py hbased
+namespace perl Hbased
+namespace php Hbased
 //
 // Types
 //
@@ -75,7 +75,7 @@ struct ColumnDescriptor {
   6:i32 bloomFilterVectorSize = 0,
   7:i32 bloomFilterNbHashes = 0,
   8:bool blockCacheEnabled = 0,
-  9:i32 timeToLive = 0x7fffffff
+  9:i32 timeToLive = -1
 }
 
 /**

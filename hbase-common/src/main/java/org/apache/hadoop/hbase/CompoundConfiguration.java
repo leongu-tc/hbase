@@ -280,12 +280,17 @@ public class CompoundConfiguration extends Configuration {
       }
     }
 
+    if (configs == null) {
+      return null;
+    }
+    
     for (ImmutableConfigMap m : this.configs) {
       String value = m.get(key);
       if (value != null) {
         return value;
       }
     }
+    
     return null;
   }
 

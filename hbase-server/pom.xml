@@ -23,7 +23,7 @@
   <parent>
     <artifactId>hbase</artifactId>
     <groupId>org.apache.hbase</groupId>
-    <version>1.2.1</version>
+    <version>1.2.1-SDP</version>
     <relativePath>..</relativePath>
   </parent>
   <artifactId>hbase-server</artifactId>
@@ -47,8 +47,7 @@
         </includes>
       </resource>
     </resources>
-    <testResources>
-      <!-- Our test artifact has different license info than our source/bin ones -->
+    <!--testResources>
       <testResource>
         <directory>src/test/resources/META-INF/</directory>
         <targetPath>META-INF/</targetPath>
@@ -63,7 +62,7 @@
           <include>**/**</include>
         </includes>
       </testResource>
-    </testResources>
+    </testResources-->
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -154,6 +153,7 @@
       </plugin>
       <!-- General ant tasks, bound to different build phases -->
       <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-antrun-plugin</artifactId>
         <executions>
           <!-- Generate web app sources -->
@@ -531,6 +531,12 @@
     <dependency>
       <groupId>tomcat</groupId>
       <artifactId>jasper-runtime</artifactId>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>aws-java-sdk</groupId>
+      <artifactId>aws-java-sdk</artifactId>
+      <version>1.7.4</version>
     </dependency>
     <dependency>
       <groupId>org.jamon</groupId>
@@ -549,6 +555,29 @@
     <dependency>
       <groupId>com.lmax</groupId>
       <artifactId>disruptor</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.cgws.sdp</groupId>
+      <artifactId>sdp-rpc</artifactId>
+      <version>1.0.0-SNAPSHOT</version>
+      <!--scope>provided</scope-->
+    </dependency>
+	<dependency>
+		<groupId>com.cgws.sdp.auth</groupId>
+		<artifactId>sdp-auth-plugin</artifactId>
+		<version>0.0.1-SNAPSHOT</version>
+		<exclusions>			
+			<exclusion>
+        <groupId>org.apache.commons</groupId>
+        <artifactId>commons-lang3</artifactId>
+      </exclusion>
+		</exclusions>
+	</dependency>
+	  <dependency>
+      <groupId>org.apache.ranger</groupId>
+      <artifactId>ranger-plugins-common</artifactId>
+      <version>0.6.0</version>
+      <scope>provided</scope>
     </dependency>
     <!-- Test dependencies -->
     <dependency>
@@ -851,7 +880,7 @@
       </activation>
       <build>
         <plugins>
-          <plugin>
+          <!--plugin>
             <groupId>org.apache.hadoop</groupId>
             <artifactId>hadoop-maven-plugins</artifactId>
             <executions>
@@ -881,7 +910,7 @@
                 </configuration>
               </execution>
             </executions>
-          </plugin>
+          </plugin-->
         </plugins>
       </build>
     </profile>

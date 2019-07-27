@@ -28,13 +28,18 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InterruptedIOException;
 import java.io.OutputStream;
+import java.net.Inet4Address;
+import java.net.InetAddress;
 import java.net.InetSocketAddress;
+import java.net.NetworkInterface;
 import java.net.Socket;
 import java.net.SocketAddress;
+import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
 import java.security.PrivilegedExceptionAction;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -47,18 +52,21 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
-
 import javax.net.SocketFactory;
 import javax.security.sasl.SaslException;
-
+import com.cgws.sdp.auth.common.SdpAuthInfo;
+import com.cgws.sdp.auth.common.SdpAuthUtil;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.hbase.AuthFailedException;
 import org.apache.hadoop.hbase.CellScanner;
 import org.apache.hadoop.hbase.DoNotRetryIOException;
 import org.apache.hadoop.hbase.HConstants;
 import org.apache.hadoop.hbase.ServerName;
 import org.apache.hadoop.hbase.classification.InterfaceAudience;
+import org.apache.hadoop.hbase.client.ConnectionConfiguration;
 import org.apache.hadoop.hbase.client.MetricsConnection;
 import org.apache.hadoop.hbase.codec.Codec;
 import org.apache.hadoop.hbase.exceptions.ConnectionClosingException;
@@ -182,6 +190,10 @@ public class RpcClientImpl extends AbstractRpcClient {
 
     protected final AtomicBoolean shouldCloseConnection = new AtomicBoolean();
     protected final CallSender callSender;
+    // Fake 'call' for failed authorization response
+    private static final int AUTHORIZATION_FAILED_CALLID = -1;
+    private String authFailedMessage = null;
+    
 
 
     /**
@@ -367,6 +379,14 @@ public class RpcClientImpl extends AbstractRpcClient {
         builder.setCellBlockCompressorClass(this.compressor.getClass().getCanonicalName());
       }
       builder.setVersionInfo(ProtobufUtil.getVersionInfo());
+      
+      try {
+        addAuthentication(builder);
+      } catch (Exception e) {
+        LOG.error("failed to add authentication.",e);
+        throw e;
+      }
+      
       this.header = builder.build();
 
       this.setName("IPC Client (" + socketFactory.hashCode() +") connection to " +
@@ -381,6 +401,55 @@ public class RpcClientImpl extends AbstractRpcClient {
       } else {
         callSender = null;
       }
+    }
+
+    private void addAuthentication(ConnectionHeader.Builder builder) throws SocketException {
+      LOG.debug("hbase authentication initializing");
+      String publicKey = conf.get(ConnectionConfiguration.HBASE_AUTHENTICATION_SDP_PUBLICKEY);
+      if (StringUtils.isBlank(publicKey)){
+        publicKey = conf.get(ConnectionConfiguration.HBASE_AUTHENTICATION_SDP_PUBLICKEY_UNDERLINE);
+      }
+
+      String privateKey = conf.get(ConnectionConfiguration.HBASE_AUTHENTICATION_SDP_PRIVATEKEY);
+      if (StringUtils.isBlank(privateKey)){
+        privateKey = conf.get(ConnectionConfiguration.HBASE_AUTHENTICATION_SDP_PRIVATEKEY_UNDERLINE);
+      }
+
+      if (StringUtils.isNotBlank(publicKey) && StringUtils.isNotBlank(privateKey)) {
+        SdpAuthInfo sdpAuthInfo = SdpAuthUtil.generateSdpAuthInfo(publicKey,privateKey);
+
+        long timestamp = sdpAuthInfo.getTimestamp();
+        int randomValue = sdpAuthInfo.getRandomValue();
+        String signature = sdpAuthInfo.getSignature();
+        
+        builder.setPublicKey(publicKey);
+        builder.setTimestamp(timestamp+"");
+        builder.setRandomValue(randomValue+"");
+        builder.setSignature(signature);
+        
+        LOG.debug(String.format("hbase authentication params, publicKey:%s timestamp:%s  nonceStr:%s signature:%s requestip:%s", publicKey, timestamp, randomValue,signature, getIpAddress().getHostAddress().toString()));
+      }
+    }
+    
+    private InetAddress getIpAddress() throws SocketException {
+      // Before we connect somewhere, we cannot be sure about what we'd be bound to; however,
+      // we only connect when the message where client ID is, is long constructed. Thus,
+      // just use whichever IP address we can find.
+      Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
+      while (interfaces.hasMoreElements()) {
+        NetworkInterface current = interfaces.nextElement();
+        if (!current.isUp() || current.isLoopback() || current.isVirtual()) continue;
+        Enumeration<InetAddress> addresses = current.getInetAddresses();
+        while (addresses.hasMoreElements()) {
+          InetAddress addr = addresses.nextElement();
+          if (addr.isLoopbackAddress()) continue;
+          if (addr instanceof Inet4Address) {
+            return addr;
+          }
+        }
+      }
+
+      throw new SocketException("Can't get client ip address, interfaces: " + interfaces);
     }
 
     private synchronized UserInformation getUserInfo(UserGroupInformation ugi) {
@@ -966,6 +1035,15 @@ public class RpcClientImpl extends AbstractRpcClient {
         ResponseHeader responseHeader = ResponseHeader.parseDelimitedFrom(in);
         int id = responseHeader.getCallId();
         call = calls.remove(id); // call.done have to be set before leaving this method
+        if (id == AUTHORIZATION_FAILED_CALLID)
+        {
+            authFailedMessage = "Authenticate failed";
+            if (responseHeader.hasException())
+            {
+                authFailedMessage =  responseHeader.getException().getStackTrace();
+            }
+            return;
+        }
         expectedCall = (call != null && !call.done);
         if (!expectedCall) {
           // So we got a response for which we have no corresponding 'call' here on the client-side.
@@ -1263,6 +1341,13 @@ public class RpcClientImpl extends AbstractRpcClient {
       }
     }
 
+    if (connection.authFailedMessage != null)
+    {
+        String message = connection.authFailedMessage;
+        connection.authFailedMessage = null;
+        throw new AuthFailedException(message);
+    }
+    
     if (call.error != null) {
       if (call.error instanceof RemoteException) {
         call.error.fillInStackTrace();

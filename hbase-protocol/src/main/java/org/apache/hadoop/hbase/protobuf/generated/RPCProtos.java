@@ -803,6 +803,96 @@ public final class RPCProtos {
      * <code>optional .VersionInfo version_info = 5;</code>
      */
     org.apache.hadoop.hbase.protobuf.generated.HBaseProtos.VersionInfoOrBuilder getVersionInfoOrBuilder();
+
+    // optional string publicKey = 6;
+    /**
+     * <code>optional string publicKey = 6;</code>
+     */
+    boolean hasPublicKey();
+    /**
+     * <code>optional string publicKey = 6;</code>
+     */
+    java.lang.String getPublicKey();
+    /**
+     * <code>optional string publicKey = 6;</code>
+     */
+    com.google.protobuf.ByteString
+        getPublicKeyBytes();
+
+    // optional string timestamp = 7;
+    /**
+     * <code>optional string timestamp = 7;</code>
+     */
+    boolean hasTimestamp();
+    /**
+     * <code>optional string timestamp = 7;</code>
+     */
+    java.lang.String getTimestamp();
+    /**
+     * <code>optional string timestamp = 7;</code>
+     */
+    com.google.protobuf.ByteString
+        getTimestampBytes();
+
+    // optional string randomValue = 8;
+    /**
+     * <code>optional string randomValue = 8;</code>
+     */
+    boolean hasRandomValue();
+    /**
+     * <code>optional string randomValue = 8;</code>
+     */
+    java.lang.String getRandomValue();
+    /**
+     * <code>optional string randomValue = 8;</code>
+     */
+    com.google.protobuf.ByteString
+        getRandomValueBytes();
+
+    // optional string signature = 9;
+    /**
+     * <code>optional string signature = 9;</code>
+     */
+    boolean hasSignature();
+    /**
+     * <code>optional string signature = 9;</code>
+     */
+    java.lang.String getSignature();
+    /**
+     * <code>optional string signature = 9;</code>
+     */
+    com.google.protobuf.ByteString
+        getSignatureBytes();
+
+    // optional string privateKey = 10;
+    /**
+     * <code>optional string privateKey = 10;</code>
+     */
+    boolean hasPrivateKey();
+    /**
+     * <code>optional string privateKey = 10;</code>
+     */
+    java.lang.String getPrivateKey();
+    /**
+     * <code>optional string privateKey = 10;</code>
+     */
+    com.google.protobuf.ByteString
+        getPrivateKeyBytes();
+
+    // optional string clientIp = 11;
+    /**
+     * <code>optional string clientIp = 11;</code>
+     */
+    boolean hasClientIp();
+    /**
+     * <code>optional string clientIp = 11;</code>
+     */
+    java.lang.String getClientIp();
+    /**
+     * <code>optional string clientIp = 11;</code>
+     */
+    com.google.protobuf.ByteString
+        getClientIpBytes();
   }
   /**
    * Protobuf type {@code ConnectionHeader}
@@ -898,6 +988,36 @@ public final class RPCProtos {
                 versionInfo_ = subBuilder.buildPartial();
               }
               bitField0_ |= 0x00000010;
+              break;
+            }
+            case 50: {
+              bitField0_ |= 0x00000020;
+              publicKey_ = input.readBytes();
+              break;
+            }
+            case 58: {
+              bitField0_ |= 0x00000040;
+              timestamp_ = input.readBytes();
+              break;
+            }
+            case 66: {
+              bitField0_ |= 0x00000080;
+              randomValue_ = input.readBytes();
+              break;
+            }
+            case 74: {
+              bitField0_ |= 0x00000100;
+              signature_ = input.readBytes();
+              break;
+            }
+            case 82: {
+              bitField0_ |= 0x00000200;
+              privateKey_ = input.readBytes();
+              break;
+            }
+            case 90: {
+              bitField0_ |= 0x00000400;
+              clientIp_ = input.readBytes();
               break;
             }
           }
@@ -1143,12 +1263,276 @@ public final class RPCProtos {
       return versionInfo_;
     }
 
+    // optional string publicKey = 6;
+    public static final int PUBLICKEY_FIELD_NUMBER = 6;
+    private java.lang.Object publicKey_;
+    /**
+     * <code>optional string publicKey = 6;</code>
+     */
+    public boolean hasPublicKey() {
+      return ((bitField0_ & 0x00000020) == 0x00000020);
+    }
+    /**
+     * <code>optional string publicKey = 6;</code>
+     */
+    public java.lang.String getPublicKey() {
+      java.lang.Object ref = publicKey_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        if (bs.isValidUtf8()) {
+          publicKey_ = s;
+        }
+        return s;
+      }
+    }
+    /**
+     * <code>optional string publicKey = 6;</code>
+     */
+    public com.google.protobuf.ByteString
+        getPublicKeyBytes() {
+      java.lang.Object ref = publicKey_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        publicKey_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    // optional string timestamp = 7;
+    public static final int TIMESTAMP_FIELD_NUMBER = 7;
+    private java.lang.Object timestamp_;
+    /**
+     * <code>optional string timestamp = 7;</code>
+     */
+    public boolean hasTimestamp() {
+      return ((bitField0_ & 0x00000040) == 0x00000040);
+    }
+    /**
+     * <code>optional string timestamp = 7;</code>
+     */
+    public java.lang.String getTimestamp() {
+      java.lang.Object ref = timestamp_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        if (bs.isValidUtf8()) {
+          timestamp_ = s;
+        }
+        return s;
+      }
+    }
+    /**
+     * <code>optional string timestamp = 7;</code>
+     */
+    public com.google.protobuf.ByteString
+        getTimestampBytes() {
+      java.lang.Object ref = timestamp_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        timestamp_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    // optional string randomValue = 8;
+    public static final int RANDOMVALUE_FIELD_NUMBER = 8;
+    private java.lang.Object randomValue_;
+    /**
+     * <code>optional string randomValue = 8;</code>
+     */
+    public boolean hasRandomValue() {
+      return ((bitField0_ & 0x00000080) == 0x00000080);
+    }
+    /**
+     * <code>optional string randomValue = 8;</code>
+     */
+    public java.lang.String getRandomValue() {
+      java.lang.Object ref = randomValue_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        if (bs.isValidUtf8()) {
+          randomValue_ = s;
+        }
+        return s;
+      }
+    }
+    /**
+     * <code>optional string randomValue = 8;</code>
+     */
+    public com.google.protobuf.ByteString
+        getRandomValueBytes() {
+      java.lang.Object ref = randomValue_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        randomValue_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    // optional string signature = 9;
+    public static final int SIGNATURE_FIELD_NUMBER = 9;
+    private java.lang.Object signature_;
+    /**
+     * <code>optional string signature = 9;</code>
+     */
+    public boolean hasSignature() {
+      return ((bitField0_ & 0x00000100) == 0x00000100);
+    }
+    /**
+     * <code>optional string signature = 9;</code>
+     */
+    public java.lang.String getSignature() {
+      java.lang.Object ref = signature_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        if (bs.isValidUtf8()) {
+          signature_ = s;
+        }
+        return s;
+      }
+    }
+    /**
+     * <code>optional string signature = 9;</code>
+     */
+    public com.google.protobuf.ByteString
+        getSignatureBytes() {
+      java.lang.Object ref = signature_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        signature_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    // optional string privateKey = 10;
+    public static final int PRIVATEKEY_FIELD_NUMBER = 10;
+    private java.lang.Object privateKey_;
+    /**
+     * <code>optional string privateKey = 10;</code>
+     */
+    public boolean hasPrivateKey() {
+      return ((bitField0_ & 0x00000200) == 0x00000200);
+    }
+    /**
+     * <code>optional string privateKey = 10;</code>
+     */
+    public java.lang.String getPrivateKey() {
+      java.lang.Object ref = privateKey_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        if (bs.isValidUtf8()) {
+          privateKey_ = s;
+        }
+        return s;
+      }
+    }
+    /**
+     * <code>optional string privateKey = 10;</code>
+     */
+    public com.google.protobuf.ByteString
+        getPrivateKeyBytes() {
+      java.lang.Object ref = privateKey_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        privateKey_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    // optional string clientIp = 11;
+    public static final int CLIENTIP_FIELD_NUMBER = 11;
+    private java.lang.Object clientIp_;
+    /**
+     * <code>optional string clientIp = 11;</code>
+     */
+    public boolean hasClientIp() {
+      return ((bitField0_ & 0x00000400) == 0x00000400);
+    }
+    /**
+     * <code>optional string clientIp = 11;</code>
+     */
+    public java.lang.String getClientIp() {
+      java.lang.Object ref = clientIp_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        if (bs.isValidUtf8()) {
+          clientIp_ = s;
+        }
+        return s;
+      }
+    }
+    /**
+     * <code>optional string clientIp = 11;</code>
+     */
+    public com.google.protobuf.ByteString
+        getClientIpBytes() {
+      java.lang.Object ref = clientIp_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        clientIp_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
     private void initFields() {
       userInfo_ = org.apache.hadoop.hbase.protobuf.generated.RPCProtos.UserInformation.getDefaultInstance();
       serviceName_ = "";
       cellBlockCodecClass_ = "";
       cellBlockCompressorClass_ = "";
       versionInfo_ = org.apache.hadoop.hbase.protobuf.generated.HBaseProtos.VersionInfo.getDefaultInstance();
+      publicKey_ = "";
+      timestamp_ = "";
+      randomValue_ = "";
+      signature_ = "";
+      privateKey_ = "";
+      clientIp_ = "";
     }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
@@ -1189,6 +1573,24 @@ public final class RPCProtos {
       if (((bitField0_ & 0x00000010) == 0x00000010)) {
         output.writeMessage(5, versionInfo_);
       }
+      if (((bitField0_ & 0x00000020) == 0x00000020)) {
+        output.writeBytes(6, getPublicKeyBytes());
+      }
+      if (((bitField0_ & 0x00000040) == 0x00000040)) {
+        output.writeBytes(7, getTimestampBytes());
+      }
+      if (((bitField0_ & 0x00000080) == 0x00000080)) {
+        output.writeBytes(8, getRandomValueBytes());
+      }
+      if (((bitField0_ & 0x00000100) == 0x00000100)) {
+        output.writeBytes(9, getSignatureBytes());
+      }
+      if (((bitField0_ & 0x00000200) == 0x00000200)) {
+        output.writeBytes(10, getPrivateKeyBytes());
+      }
+      if (((bitField0_ & 0x00000400) == 0x00000400)) {
+        output.writeBytes(11, getClientIpBytes());
+      }
       getUnknownFields().writeTo(output);
     }
 
@@ -1217,6 +1619,30 @@ public final class RPCProtos {
       if (((bitField0_ & 0x00000010) == 0x00000010)) {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(5, versionInfo_);
+      }
+      if (((bitField0_ & 0x00000020) == 0x00000020)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBytesSize(6, getPublicKeyBytes());
+      }
+      if (((bitField0_ & 0x00000040) == 0x00000040)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBytesSize(7, getTimestampBytes());
+      }
+      if (((bitField0_ & 0x00000080) == 0x00000080)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBytesSize(8, getRandomValueBytes());
+      }
+      if (((bitField0_ & 0x00000100) == 0x00000100)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBytesSize(9, getSignatureBytes());
+      }
+      if (((bitField0_ & 0x00000200) == 0x00000200)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBytesSize(10, getPrivateKeyBytes());
+      }
+      if (((bitField0_ & 0x00000400) == 0x00000400)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBytesSize(11, getClientIpBytes());
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
@@ -1266,6 +1692,36 @@ public final class RPCProtos {
         result = result && getVersionInfo()
             .equals(other.getVersionInfo());
       }
+      result = result && (hasPublicKey() == other.hasPublicKey());
+      if (hasPublicKey()) {
+        result = result && getPublicKey()
+            .equals(other.getPublicKey());
+      }
+      result = result && (hasTimestamp() == other.hasTimestamp());
+      if (hasTimestamp()) {
+        result = result && getTimestamp()
+            .equals(other.getTimestamp());
+      }
+      result = result && (hasRandomValue() == other.hasRandomValue());
+      if (hasRandomValue()) {
+        result = result && getRandomValue()
+            .equals(other.getRandomValue());
+      }
+      result = result && (hasSignature() == other.hasSignature());
+      if (hasSignature()) {
+        result = result && getSignature()
+            .equals(other.getSignature());
+      }
+      result = result && (hasPrivateKey() == other.hasPrivateKey());
+      if (hasPrivateKey()) {
+        result = result && getPrivateKey()
+            .equals(other.getPrivateKey());
+      }
+      result = result && (hasClientIp() == other.hasClientIp());
+      if (hasClientIp()) {
+        result = result && getClientIp()
+            .equals(other.getClientIp());
+      }
       result = result &&
           getUnknownFields().equals(other.getUnknownFields());
       return result;
@@ -1298,6 +1754,30 @@ public final class RPCProtos {
       if (hasVersionInfo()) {
         hash = (37 * hash) + VERSION_INFO_FIELD_NUMBER;
         hash = (53 * hash) + getVersionInfo().hashCode();
+      }
+      if (hasPublicKey()) {
+        hash = (37 * hash) + PUBLICKEY_FIELD_NUMBER;
+        hash = (53 * hash) + getPublicKey().hashCode();
+      }
+      if (hasTimestamp()) {
+        hash = (37 * hash) + TIMESTAMP_FIELD_NUMBER;
+        hash = (53 * hash) + getTimestamp().hashCode();
+      }
+      if (hasRandomValue()) {
+        hash = (37 * hash) + RANDOMVALUE_FIELD_NUMBER;
+        hash = (53 * hash) + getRandomValue().hashCode();
+      }
+      if (hasSignature()) {
+        hash = (37 * hash) + SIGNATURE_FIELD_NUMBER;
+        hash = (53 * hash) + getSignature().hashCode();
+      }
+      if (hasPrivateKey()) {
+        hash = (37 * hash) + PRIVATEKEY_FIELD_NUMBER;
+        hash = (53 * hash) + getPrivateKey().hashCode();
+      }
+      if (hasClientIp()) {
+        hash = (37 * hash) + CLIENTIP_FIELD_NUMBER;
+        hash = (53 * hash) + getClientIp().hashCode();
       }
       hash = (29 * hash) + getUnknownFields().hashCode();
       memoizedHashCode = hash;
@@ -1432,6 +1912,18 @@ public final class RPCProtos {
           versionInfoBuilder_.clear();
         }
         bitField0_ = (bitField0_ & ~0x00000010);
+        publicKey_ = "";
+        bitField0_ = (bitField0_ & ~0x00000020);
+        timestamp_ = "";
+        bitField0_ = (bitField0_ & ~0x00000040);
+        randomValue_ = "";
+        bitField0_ = (bitField0_ & ~0x00000080);
+        signature_ = "";
+        bitField0_ = (bitField0_ & ~0x00000100);
+        privateKey_ = "";
+        bitField0_ = (bitField0_ & ~0x00000200);
+        clientIp_ = "";
+        bitField0_ = (bitField0_ & ~0x00000400);
         return this;
       }
 
@@ -1488,6 +1980,30 @@ public final class RPCProtos {
         } else {
           result.versionInfo_ = versionInfoBuilder_.build();
         }
+        if (((from_bitField0_ & 0x00000020) == 0x00000020)) {
+          to_bitField0_ |= 0x00000020;
+        }
+        result.publicKey_ = publicKey_;
+        if (((from_bitField0_ & 0x00000040) == 0x00000040)) {
+          to_bitField0_ |= 0x00000040;
+        }
+        result.timestamp_ = timestamp_;
+        if (((from_bitField0_ & 0x00000080) == 0x00000080)) {
+          to_bitField0_ |= 0x00000080;
+        }
+        result.randomValue_ = randomValue_;
+        if (((from_bitField0_ & 0x00000100) == 0x00000100)) {
+          to_bitField0_ |= 0x00000100;
+        }
+        result.signature_ = signature_;
+        if (((from_bitField0_ & 0x00000200) == 0x00000200)) {
+          to_bitField0_ |= 0x00000200;
+        }
+        result.privateKey_ = privateKey_;
+        if (((from_bitField0_ & 0x00000400) == 0x00000400)) {
+          to_bitField0_ |= 0x00000400;
+        }
+        result.clientIp_ = clientIp_;
         result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
@@ -1524,6 +2040,36 @@ public final class RPCProtos {
         }
         if (other.hasVersionInfo()) {
           mergeVersionInfo(other.getVersionInfo());
+        }
+        if (other.hasPublicKey()) {
+          bitField0_ |= 0x00000020;
+          publicKey_ = other.publicKey_;
+          onChanged();
+        }
+        if (other.hasTimestamp()) {
+          bitField0_ |= 0x00000040;
+          timestamp_ = other.timestamp_;
+          onChanged();
+        }
+        if (other.hasRandomValue()) {
+          bitField0_ |= 0x00000080;
+          randomValue_ = other.randomValue_;
+          onChanged();
+        }
+        if (other.hasSignature()) {
+          bitField0_ |= 0x00000100;
+          signature_ = other.signature_;
+          onChanged();
+        }
+        if (other.hasPrivateKey()) {
+          bitField0_ |= 0x00000200;
+          privateKey_ = other.privateKey_;
+          onChanged();
+        }
+        if (other.hasClientIp()) {
+          bitField0_ |= 0x00000400;
+          clientIp_ = other.clientIp_;
+          onChanged();
         }
         this.mergeUnknownFields(other.getUnknownFields());
         return this;
@@ -2078,6 +2624,450 @@ public final class RPCProtos {
           versionInfo_ = null;
         }
         return versionInfoBuilder_;
+      }
+
+      // optional string publicKey = 6;
+      private java.lang.Object publicKey_ = "";
+      /**
+       * <code>optional string publicKey = 6;</code>
+       */
+      public boolean hasPublicKey() {
+        return ((bitField0_ & 0x00000020) == 0x00000020);
+      }
+      /**
+       * <code>optional string publicKey = 6;</code>
+       */
+      public java.lang.String getPublicKey() {
+        java.lang.Object ref = publicKey_;
+        if (!(ref instanceof java.lang.String)) {
+          java.lang.String s = ((com.google.protobuf.ByteString) ref)
+              .toStringUtf8();
+          publicKey_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <code>optional string publicKey = 6;</code>
+       */
+      public com.google.protobuf.ByteString
+          getPublicKeyBytes() {
+        java.lang.Object ref = publicKey_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          publicKey_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>optional string publicKey = 6;</code>
+       */
+      public Builder setPublicKey(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000020;
+        publicKey_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional string publicKey = 6;</code>
+       */
+      public Builder clearPublicKey() {
+        bitField0_ = (bitField0_ & ~0x00000020);
+        publicKey_ = getDefaultInstance().getPublicKey();
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional string publicKey = 6;</code>
+       */
+      public Builder setPublicKeyBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000020;
+        publicKey_ = value;
+        onChanged();
+        return this;
+      }
+
+      // optional string timestamp = 7;
+      private java.lang.Object timestamp_ = "";
+      /**
+       * <code>optional string timestamp = 7;</code>
+       */
+      public boolean hasTimestamp() {
+        return ((bitField0_ & 0x00000040) == 0x00000040);
+      }
+      /**
+       * <code>optional string timestamp = 7;</code>
+       */
+      public java.lang.String getTimestamp() {
+        java.lang.Object ref = timestamp_;
+        if (!(ref instanceof java.lang.String)) {
+          java.lang.String s = ((com.google.protobuf.ByteString) ref)
+              .toStringUtf8();
+          timestamp_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <code>optional string timestamp = 7;</code>
+       */
+      public com.google.protobuf.ByteString
+          getTimestampBytes() {
+        java.lang.Object ref = timestamp_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          timestamp_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>optional string timestamp = 7;</code>
+       */
+      public Builder setTimestamp(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000040;
+        timestamp_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional string timestamp = 7;</code>
+       */
+      public Builder clearTimestamp() {
+        bitField0_ = (bitField0_ & ~0x00000040);
+        timestamp_ = getDefaultInstance().getTimestamp();
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional string timestamp = 7;</code>
+       */
+      public Builder setTimestampBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000040;
+        timestamp_ = value;
+        onChanged();
+        return this;
+      }
+
+      // optional string randomValue = 8;
+      private java.lang.Object randomValue_ = "";
+      /**
+       * <code>optional string randomValue = 8;</code>
+       */
+      public boolean hasRandomValue() {
+        return ((bitField0_ & 0x00000080) == 0x00000080);
+      }
+      /**
+       * <code>optional string randomValue = 8;</code>
+       */
+      public java.lang.String getRandomValue() {
+        java.lang.Object ref = randomValue_;
+        if (!(ref instanceof java.lang.String)) {
+          java.lang.String s = ((com.google.protobuf.ByteString) ref)
+              .toStringUtf8();
+          randomValue_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <code>optional string randomValue = 8;</code>
+       */
+      public com.google.protobuf.ByteString
+          getRandomValueBytes() {
+        java.lang.Object ref = randomValue_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          randomValue_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>optional string randomValue = 8;</code>
+       */
+      public Builder setRandomValue(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000080;
+        randomValue_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional string randomValue = 8;</code>
+       */
+      public Builder clearRandomValue() {
+        bitField0_ = (bitField0_ & ~0x00000080);
+        randomValue_ = getDefaultInstance().getRandomValue();
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional string randomValue = 8;</code>
+       */
+      public Builder setRandomValueBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000080;
+        randomValue_ = value;
+        onChanged();
+        return this;
+      }
+
+      // optional string signature = 9;
+      private java.lang.Object signature_ = "";
+      /**
+       * <code>optional string signature = 9;</code>
+       */
+      public boolean hasSignature() {
+        return ((bitField0_ & 0x00000100) == 0x00000100);
+      }
+      /**
+       * <code>optional string signature = 9;</code>
+       */
+      public java.lang.String getSignature() {
+        java.lang.Object ref = signature_;
+        if (!(ref instanceof java.lang.String)) {
+          java.lang.String s = ((com.google.protobuf.ByteString) ref)
+              .toStringUtf8();
+          signature_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <code>optional string signature = 9;</code>
+       */
+      public com.google.protobuf.ByteString
+          getSignatureBytes() {
+        java.lang.Object ref = signature_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          signature_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>optional string signature = 9;</code>
+       */
+      public Builder setSignature(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000100;
+        signature_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional string signature = 9;</code>
+       */
+      public Builder clearSignature() {
+        bitField0_ = (bitField0_ & ~0x00000100);
+        signature_ = getDefaultInstance().getSignature();
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional string signature = 9;</code>
+       */
+      public Builder setSignatureBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000100;
+        signature_ = value;
+        onChanged();
+        return this;
+      }
+
+      // optional string privateKey = 10;
+      private java.lang.Object privateKey_ = "";
+      /**
+       * <code>optional string privateKey = 10;</code>
+       */
+      public boolean hasPrivateKey() {
+        return ((bitField0_ & 0x00000200) == 0x00000200);
+      }
+      /**
+       * <code>optional string privateKey = 10;</code>
+       */
+      public java.lang.String getPrivateKey() {
+        java.lang.Object ref = privateKey_;
+        if (!(ref instanceof java.lang.String)) {
+          java.lang.String s = ((com.google.protobuf.ByteString) ref)
+              .toStringUtf8();
+          privateKey_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <code>optional string privateKey = 10;</code>
+       */
+      public com.google.protobuf.ByteString
+          getPrivateKeyBytes() {
+        java.lang.Object ref = privateKey_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          privateKey_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>optional string privateKey = 10;</code>
+       */
+      public Builder setPrivateKey(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000200;
+        privateKey_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional string privateKey = 10;</code>
+       */
+      public Builder clearPrivateKey() {
+        bitField0_ = (bitField0_ & ~0x00000200);
+        privateKey_ = getDefaultInstance().getPrivateKey();
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional string privateKey = 10;</code>
+       */
+      public Builder setPrivateKeyBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000200;
+        privateKey_ = value;
+        onChanged();
+        return this;
+      }
+
+      // optional string clientIp = 11;
+      private java.lang.Object clientIp_ = "";
+      /**
+       * <code>optional string clientIp = 11;</code>
+       */
+      public boolean hasClientIp() {
+        return ((bitField0_ & 0x00000400) == 0x00000400);
+      }
+      /**
+       * <code>optional string clientIp = 11;</code>
+       */
+      public java.lang.String getClientIp() {
+        java.lang.Object ref = clientIp_;
+        if (!(ref instanceof java.lang.String)) {
+          java.lang.String s = ((com.google.protobuf.ByteString) ref)
+              .toStringUtf8();
+          clientIp_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <code>optional string clientIp = 11;</code>
+       */
+      public com.google.protobuf.ByteString
+          getClientIpBytes() {
+        java.lang.Object ref = clientIp_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          clientIp_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>optional string clientIp = 11;</code>
+       */
+      public Builder setClientIp(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000400;
+        clientIp_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional string clientIp = 11;</code>
+       */
+      public Builder clearClientIp() {
+        bitField0_ = (bitField0_ & ~0x00000400);
+        clientIp_ = getDefaultInstance().getClientIp();
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional string clientIp = 11;</code>
+       */
+      public Builder setClientIpBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000400;
+        clientIp_ = value;
+        onChanged();
+        return this;
       }
 
       // @@protoc_insertion_point(builder_scope:ConnectionHeader)
@@ -6132,24 +7122,27 @@ public final class RPCProtos {
     java.lang.String[] descriptorData = {
       "\n\tRPC.proto\032\rTracing.proto\032\013HBase.proto\"" +
       "<\n\017UserInformation\022\026\n\016effective_user\030\001 \002" +
-      "(\t\022\021\n\treal_user\030\002 \001(\t\"\266\001\n\020ConnectionHead" +
+      "(\t\022\021\n\treal_user\030\002 \001(\t\"\252\002\n\020ConnectionHead" +
       "er\022#\n\tuser_info\030\001 \001(\0132\020.UserInformation\022" +
       "\024\n\014service_name\030\002 \001(\t\022\036\n\026cell_block_code" +
       "c_class\030\003 \001(\t\022#\n\033cell_block_compressor_c" +
       "lass\030\004 \001(\t\022\"\n\014version_info\030\005 \001(\0132\014.Versi" +
-      "onInfo\"\037\n\rCellBlockMeta\022\016\n\006length\030\001 \001(\r\"" +
-      "|\n\021ExceptionResponse\022\034\n\024exception_class_" +
-      "name\030\001 \001(\t\022\023\n\013stack_trace\030\002 \001(\t\022\020\n\010hostn",
-      "ame\030\003 \001(\t\022\014\n\004port\030\004 \001(\005\022\024\n\014do_not_retry\030" +
-      "\005 \001(\010\"\246\001\n\rRequestHeader\022\017\n\007call_id\030\001 \001(\r" +
-      "\022\035\n\ntrace_info\030\002 \001(\0132\t.RPCTInfo\022\023\n\013metho" +
-      "d_name\030\003 \001(\t\022\025\n\rrequest_param\030\004 \001(\010\022\'\n\017c" +
-      "ell_block_meta\030\005 \001(\0132\016.CellBlockMeta\022\020\n\010" +
-      "priority\030\006 \001(\r\"q\n\016ResponseHeader\022\017\n\007call" +
-      "_id\030\001 \001(\r\022%\n\texception\030\002 \001(\0132\022.Exception" +
-      "Response\022\'\n\017cell_block_meta\030\003 \001(\0132\016.Cell" +
-      "BlockMetaB<\n*org.apache.hadoop.hbase.pro" +
-      "tobuf.generatedB\tRPCProtosH\001\240\001\001"
+      "onInfo\022\021\n\tpublicKey\030\006 \001(\t\022\021\n\ttimestamp\030\007" +
+      " \001(\t\022\023\n\013randomValue\030\010 \001(\t\022\021\n\tsignature\030\t" +
+      " \001(\t\022\022\n\nprivateKey\030\n \001(\t\022\020\n\010clientIp\030\013 \001",
+      "(\t\"\037\n\rCellBlockMeta\022\016\n\006length\030\001 \001(\r\"|\n\021E" +
+      "xceptionResponse\022\034\n\024exception_class_name" +
+      "\030\001 \001(\t\022\023\n\013stack_trace\030\002 \001(\t\022\020\n\010hostname\030" +
+      "\003 \001(\t\022\014\n\004port\030\004 \001(\005\022\024\n\014do_not_retry\030\005 \001(" +
+      "\010\"\246\001\n\rRequestHeader\022\017\n\007call_id\030\001 \001(\r\022\035\n\n" +
+      "trace_info\030\002 \001(\0132\t.RPCTInfo\022\023\n\013method_na" +
+      "me\030\003 \001(\t\022\025\n\rrequest_param\030\004 \001(\010\022\'\n\017cell_" +
+      "block_meta\030\005 \001(\0132\016.CellBlockMeta\022\020\n\010prio" +
+      "rity\030\006 \001(\r\"q\n\016ResponseHeader\022\017\n\007call_id\030" +
+      "\001 \001(\r\022%\n\texception\030\002 \001(\0132\022.ExceptionResp",
+      "onse\022\'\n\017cell_block_meta\030\003 \001(\0132\016.CellBloc" +
+      "kMetaB<\n*org.apache.hadoop.hbase.protobu" +
+      "f.generatedB\tRPCProtosH\001\240\001\001"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
       new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
@@ -6167,7 +7160,7 @@ public final class RPCProtos {
           internal_static_ConnectionHeader_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_ConnectionHeader_descriptor,
-              new java.lang.String[] { "UserInfo", "ServiceName", "CellBlockCodecClass", "CellBlockCompressorClass", "VersionInfo", });
+              new java.lang.String[] { "UserInfo", "ServiceName", "CellBlockCodecClass", "CellBlockCompressorClass", "VersionInfo", "PublicKey", "Timestamp", "RandomValue", "Signature", "PrivateKey", "ClientIp", });
           internal_static_CellBlockMeta_descriptor =
             getDescriptor().getMessageTypes().get(2);
           internal_static_CellBlockMeta_fieldAccessorTable = new

@@ -23,7 +23,7 @@
     <parent>
         <artifactId>hbase</artifactId>
         <groupId>org.apache.hbase</groupId>
-        <version>1.2.1</version>
+        <version>1.2.1-SDP</version>
         <relativePath>..</relativePath>
     </parent>
 
@@ -89,6 +89,7 @@
                       <groupId>org.apache.hadoop</groupId>
                       <artifactId>hadoop-maven-plugins</artifactId>
                       <versionRange>[2.0.5-alpha,)</versionRange>
+		      <version>2.7.2</version>
                       <goals>
                         <goal>protoc</goal>
                       </goals>
@@ -153,6 +154,7 @@
               <plugin>
                 <groupId>org.apache.hadoop</groupId>
                 <artifactId>hadoop-maven-plugins</artifactId>
+		<version>2.7.2</version>
                 <executions>
                   <execution>
                     <id>compile-protoc</id>

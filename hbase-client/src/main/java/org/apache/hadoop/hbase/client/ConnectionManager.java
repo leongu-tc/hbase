@@ -45,9 +45,11 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.hbase.AuthFailedException;
 import org.apache.hadoop.hbase.DoNotRetryIOException;
 import org.apache.hadoop.hbase.HBaseConfiguration;
 import org.apache.hadoop.hbase.HConstants;
@@ -183,6 +185,7 @@ import org.apache.hadoop.hbase.protobuf.generated.MasterProtos.UnassignRegionReq
 import org.apache.hadoop.hbase.protobuf.generated.MasterProtos.UnassignRegionResponse;
 import org.apache.hadoop.hbase.regionserver.RegionServerStoppedException;
 import org.apache.hadoop.hbase.security.User;
+import org.apache.hadoop.hbase.security.User.SecureHadoopUser;
 import org.apache.hadoop.hbase.security.UserProvider;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.apache.hadoop.hbase.util.EnvironmentEdgeManager;
@@ -192,6 +195,7 @@ import org.apache.hadoop.hbase.zookeeper.MasterAddressTracker;
 import org.apache.hadoop.hbase.zookeeper.ZKUtil;
 import org.apache.hadoop.hbase.zookeeper.ZooKeeperWatcher;
 import org.apache.hadoop.ipc.RemoteException;
+import org.apache.hadoop.security.UserGroupInformation;
 import org.apache.zookeeper.KeeperException;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -336,8 +340,32 @@ class ConnectionManager {
   }
 
   static ClusterConnection createConnectionInternal(Configuration conf) throws IOException {
+//    UserProvider provider = UserProvider.instantiate(conf);
+//    return createConnection(conf, false, null, provider.getCurrent());
     UserProvider provider = UserProvider.instantiate(conf);
-    return createConnection(conf, false, null, provider.getCurrent());
+    User currentUser = null;
+    try {
+      currentUser = provider.getCurrent();
+    } catch (Exception e) {
+      LOG.warn("Failed to get current user from configuration.", e);
+      currentUser = null;
+    }
+    
+    if (currentUser == null) {
+      currentUser = getCurrentUser();
+    }
+    
+    return createConnection(conf, false, null, currentUser);
+  }
+  
+  private static User getCurrentUser(){
+    String currentUserName = System.getProperty("user.name");
+    if(StringUtils.isBlank(currentUserName)){
+      LOG.warn("The current user name is blank, and set it to hbase user.");
+      currentUserName = "hbase";
+    }
+    
+    return new User.SecureHadoopUser(UserGroupInformation.createRemoteUser(currentUserName));
   }
 
   /**
@@ -362,8 +390,21 @@ class ConnectionManager {
    */
   public static HConnection createConnection(Configuration conf, ExecutorService pool)
   throws IOException {
+//    UserProvider provider = UserProvider.instantiate(conf);
     UserProvider provider = UserProvider.instantiate(conf);
-    return createConnection(conf, false, pool, provider.getCurrent());
+    User currentUser = null;
+    try {
+      currentUser = provider.getCurrent();
+    } catch (Exception e) {
+      LOG.warn("Failed to get current user from configuration.", e);
+      currentUser = null;
+    }
+    
+    if (currentUser == null) {
+      currentUser = getCurrentUser();
+    }
+    
+    return createConnection(conf, false, pool, currentUser);
   }
 
   /**
@@ -420,8 +461,21 @@ class ConnectionManager {
   @Deprecated
   static HConnection createConnection(final Configuration conf, final boolean managed)
       throws IOException {
+    //UserProvider provider = UserProvider.instantiate(conf);
     UserProvider provider = UserProvider.instantiate(conf);
-    return createConnection(conf, managed, null, provider.getCurrent());
+    User currentUser = null;
+    try {
+      currentUser = provider.getCurrent();
+    } catch (Exception e) {
+      LOG.warn("Failed to get current user from configuration.", e);
+      currentUser = null;
+    }
+    
+    if (currentUser == null) {
+      currentUser = getCurrentUser();
+    }
+    
+    return createConnection(conf, managed, null, currentUser);
   }
 
   @Deprecated
@@ -1555,6 +1609,11 @@ class ConnectionManager {
               exceptionCaught = e;
             } catch (ServiceException e) {
               exceptionCaught = e;
+              String msg = e.getMessage();
+              if (msg.indexOf("AuthFailedException") != -1)
+              {
+            	  throw new AuthFailedException(msg);
+              }
             }
 
             throw new MasterNotRunningException(exceptionCaught);
@@ -1735,9 +1794,15 @@ class ConnectionManager {
           MasterServiceStubMaker stubMaker = new MasterServiceStubMaker();
           try {
             this.masterServiceState.stub = stubMaker.makeStub();
-          } catch (MasterNotRunningException ex) {
+          }
+          catch(AuthFailedException ex1)
+          {
+              throw ex1;
+          }
+          catch (MasterNotRunningException ex) {
             throw ex;
-          } catch (IOException e) {
+          } 
+          catch (IOException e) {
             // rethrow as MasterNotRunningException so that we can keep the method sig
             throw new MasterNotRunningException(e);
           }
